@@ -497,16 +497,19 @@ textarea:focus-visible {
 /* ---------- Next Event (homepage) ---------- */
 .next-event {
   position: relative;
-  padding: var(--space-5) 0;
-  background: linear-gradient(120deg, var(--color-red-deep), var(--color-red));
+  background:
+    linear-gradient(160deg, rgba(110, 20, 32, 0.82) 0%, rgba(18, 13, 13, 0.92) 100%),
+    url('../Images/map-texture.jpg');
+  background-size: cover;
+  background-position: center;
   border-bottom: 1px solid var(--color-border-soft);
 }
+.next-event .section-head h2 { color: var(--color-white); }
 .next-event__card {
   max-width: 640px;
   margin: 0 auto;
   text-align: center;
 }
-.next-event__card .eyebrow { color: var(--color-gold-soft); }
 .next-event__date {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 4vw, 2.6rem);

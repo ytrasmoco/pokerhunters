@@ -75,7 +75,6 @@ const POKER_HUNTERS_EVENTS = [
 
     var next = upcoming[0];
     el.innerHTML =
-      '<span class="eyebrow">Next Hunt</span>' +
       '<p class="next-event__date">' + formatDate(next.date) + '</p>' +
       (next.notes ? '<p class="next-event__notes">' + next.notes + '</p>' : '') +
       '<div class="next-event__ctas">' +
