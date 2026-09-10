@@ -62,7 +62,7 @@
         'Area: ' + area,
         'People: ' + people,
         date ? 'Preferred date: ' + date : null,
-        'Call back on: ' + phone,
+        'Phone: ' + phone,
         message ? 'Message: ' + message : null
       ]);
     });
