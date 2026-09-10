@@ -22,8 +22,8 @@
  * ============================================================
  */
 const POKER_HUNTERS_EVENTS = [
-  { date: '2026-10-18' },
-  { date: '2026-11-08' },
+  { date: '2026-09-25', notes: 'Bonus checkpoint added for this one' },
+  { date: '2026-10-25' },
   { date: '2026-11-29', notes: 'Bonus checkpoint added for this one' },
 ];
 

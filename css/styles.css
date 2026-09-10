@@ -186,6 +186,7 @@ textarea:focus-visible {
 .btn--outline:hover { border-color: var(--color-gold); color: var(--color-gold); }
 
 .btn--block { width: 100%; }
+.btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ---------- Header / Nav ---------- */
 .site-header {
