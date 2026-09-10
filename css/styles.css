@@ -494,6 +494,71 @@ textarea:focus-visible {
   text-align: center;
 }
 
+/* ---------- Next Event (homepage) ---------- */
+.next-event {
+  position: relative;
+  padding: var(--space-5) 0;
+  background: linear-gradient(120deg, var(--color-red-deep), var(--color-red));
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.next-event__card {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+.next-event__card .eyebrow { color: var(--color-gold-soft); }
+.next-event__date {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--color-white);
+  margin: 4px 0 8px;
+}
+.next-event__notes {
+  color: var(--color-cream);
+  opacity: 0.9;
+  margin: 0 0 var(--space-3);
+}
+.next-event__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.next-event .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--color-white); }
+.next-event .btn--outline:hover { border-color: var(--color-white); }
+
+/* ---------- Events page ---------- */
+.events-list {
+  max-width: 640px;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-3);
+}
+.event-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+.event-card__date {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-gold);
+  margin: 0 0 6px;
+}
+.event-card__notes {
+  color: var(--color-cream);
+  opacity: 0.85;
+  margin: 0 0 var(--space-3);
+}
+.event-card--empty {
+  border-color: var(--color-border-soft);
+  color: var(--color-cream);
+}
+.event-card--empty p { opacity: 0.85; margin-bottom: var(--space-3); }
+
 /* ---------- CTA banner ---------- */
 .cta-banner {
   background: linear-gradient(120deg, var(--color-red-deep), var(--color-red));

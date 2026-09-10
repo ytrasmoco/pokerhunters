@@ -73,6 +73,13 @@
   var signupStatus = document.getElementById('signupStatus');
 
   if (signupForm) {
+    // Pre-fill the date if arriving via a "Sign Up for This Date" link
+    // (e.g. signup.html?date=2026-10-18) from the homepage or events page.
+    var requestedDate = new URLSearchParams(window.location.search).get('date');
+    if (requestedDate && /^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
+      signupForm.date.value = requestedDate;
+    }
+
     signupForm.addEventListener('submit', function (event) {
       event.preventDefault();
 
