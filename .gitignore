@@ -1,0 +1,16 @@
+# Local dev/build artifacts - not part of the deployed site
+deploy/
+.claude/
+
+# Unused/original source images kept locally for reference (not referenced by the site)
+Images/P&R.png
+Images/original-40b8ddc08dd000a3620c2bd452b19b60.webp
+Images/hf_20260908_124927_63eed66a-3ce8-4a4b-9f04-3760101cd2ec.png
+Images/hf_20260908_155538_ca8542ab-a006-41e0-b4cc-0d0332abef82.png
+Images/Header.png
+Images/background.png
+Images/pr0.png
+Images/pr1.png
+Images/pr2.png
+Images/pr3.png
+Images/pr4.png
