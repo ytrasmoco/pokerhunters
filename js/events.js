@@ -107,8 +107,36 @@ const POKER_HUNTERS_EVENTS = [
     }).join('');
   }
 
+  function renderSignupDateOptions() {
+    var select = document.getElementById('su-date');
+    if (!select) return;
+
+    var upcoming = getUpcoming();
+
+    if (upcoming.length === 0) {
+      select.innerHTML = '<option value="" disabled selected>No dates available — please contact us</option>';
+      return;
+    }
+
+    var options = ['<option value="" disabled selected>Choose a date</option>'].concat(
+      upcoming.map(function (ev) {
+        var label = formatDate(ev.date) + (ev.notes ? ' — ' + ev.notes : '');
+        return '<option value="' + ev.iso + '">' + label + '</option>';
+      })
+    );
+    select.innerHTML = options.join('');
+
+    // Pre-fill if arriving via a "Sign Up for This Date" link
+    // (e.g. signup.html?date=2026-10-18) from the homepage or events page.
+    var requestedDate = new URLSearchParams(window.location.search).get('date');
+    if (requestedDate && upcoming.some(function (ev) { return ev.iso === requestedDate; })) {
+      select.value = requestedDate;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     renderNextEvent();
     renderEventsList();
+    renderSignupDateOptions();
   });
 })();

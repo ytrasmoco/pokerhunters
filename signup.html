@@ -109,8 +109,10 @@
                 <input type="text" id="su-area" name="area" value="Northamptonshire" readonly>
               </div>
               <div>
-                <label for="su-date">Preferred date <span aria-hidden="true">*</span></label>
-                <input type="date" id="su-date" name="date" required>
+                <label for="su-date">Event date <span aria-hidden="true">*</span></label>
+                <select id="su-date" name="date" required>
+                  <option value="" disabled selected>Loading dates…</option>
+                </select>
               </div>
             </div>
             <div class="form-row">
@@ -177,6 +179,7 @@
   </div>
 </footer>
 
+<script src="js/events.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
