@@ -394,7 +394,7 @@ textarea:focus-visible {
 }
 .pricing-card__price span {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
   color: var(--color-cream);
   opacity: 0.75;
   display: block;
