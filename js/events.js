@@ -32,7 +32,7 @@ const POKER_HUNTERS_EVENTS = [
  * google-apps-script/Code.gs for the backend code and setup
  * instructions. Paste the deployed Web App URL below once set up.
  */
-const POKER_HUNTERS_BOOKING_API_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
+const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycbzbGE7AlTYacnL9zwkzcsrcRiJwB4w7NNDCxAZW6bwl1NNhKplrZYBzliigcV2Qmo43rg/exec';
 
 /* ============================================================
  *  Rendering logic — no need to edit anything below this line
