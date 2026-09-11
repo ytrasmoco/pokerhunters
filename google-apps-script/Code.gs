@@ -30,15 +30,29 @@ function getSheet_() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(HEADERS);
+    // Force the Event Date column to plain text so Sheets doesn't
+    // silently convert "2026-10-25" into a Date object, which would
+    // break the string comparisons below.
+    sheet.getRange(1, 2, sheet.getMaxRows(), 1).setNumberFormat('@');
   }
   return sheet;
+}
+
+// Sheets sometimes auto-converts a date-like string into a real Date
+// object regardless of column format. Normalize whatever comes back
+// into a plain "yyyy-MM-dd" string so comparisons are reliable.
+function normalizeDate_(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  }
+  return String(value || '').trim();
 }
 
 function countConfirmed_(sheet, eventDate) {
   var rows = sheet.getDataRange().getValues();
   var count = 0;
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][1] === eventDate && rows[i][2] === 'Confirmed') {
+    if (normalizeDate_(rows[i][1]) === eventDate && rows[i][2] === 'Confirmed') {
       count++;
     }
   }
@@ -129,7 +143,7 @@ function doGet(e) {
   var counts = {};
 
   for (var i = 1; i < rows.length; i++) {
-    var date = rows[i][1];
+    var date = normalizeDate_(rows[i][1]);
     var status = rows[i][2];
     if (date && status === 'Confirmed') {
       counts[date] = (counts[date] || 0) + 1;
