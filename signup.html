@@ -90,7 +90,7 @@
 
         <div class="form-card">
           <h3>Your Sign-Up Details</h3>
-          <p class="required-note">Fill this in and we'll open an email to bookings@pokerhunters.co.uk with your sign-up ready to send — nothing is sent until you hit send in your email app. We'll reply to confirm.</p>
+          <p class="required-note">Fill this in and we'll confirm your booking instantly by email if there's space on that date.</p>
           <form id="signupForm" novalidate>
             <div class="form-row">
               <label for="teamName">Team name <span class="hint">(optional, just for fun)</span></label>
@@ -105,6 +105,10 @@
                 <label for="su-phone">Phone number <span aria-hidden="true">*</span></label>
                 <input type="tel" id="su-phone" name="phone" autocomplete="tel" required placeholder="So we can confirm">
               </div>
+            </div>
+            <div class="form-row">
+              <label for="su-email">Email address <span aria-hidden="true">*</span></label>
+              <input type="email" id="su-email" name="email" autocomplete="email" required placeholder="So we can send your confirmation">
             </div>
             <div class="form-row form-row--split">
               <div>

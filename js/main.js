@@ -82,6 +82,7 @@
 
       var teamName = signupForm.teamName.value.trim();
       var name = signupForm.name.value.trim();
+      var email = signupForm.email.value.trim();
       var phone = signupForm.phone.value.trim();
       var area = signupForm.area.value;
       var date = signupForm.date.value;
@@ -89,8 +90,8 @@
       var notes = signupForm.notes.value.trim();
       var consent = signupForm.consent.checked;
 
-      if (!name || !phone || !area || !date) {
-        showError(signupStatus, 'Please fill in your name, phone number, area and event date.');
+      if (!name || !email || !phone || !area || !date) {
+        showError(signupStatus, 'Please fill in your name, email, phone number, area and event date.');
         return;
       }
       if (!consent) {
@@ -98,16 +99,44 @@
         return;
       }
 
-      sendAsEmail(signupStatus, 'bookings@pokerhunters.co.uk', 'Poker Hunters sign-up', 'Poker Hunters sign-up', [
-        teamName ? 'Team name: ' + teamName : null,
-        'Lead contact: ' + name,
-        'Phone: ' + phone,
-        'Area: ' + area,
-        'Event date: ' + date,
-        'People: ' + people,
-        notes ? 'Notes: ' + notes : null,
-        'Licence & consent confirmed: Yes'
-      ]);
+      var apiUrl = (typeof POKER_HUNTERS_BOOKING_API_URL !== 'undefined') ? POKER_HUNTERS_BOOKING_API_URL : '';
+      if (!apiUrl || apiUrl.indexOf('REPLACE_WITH') === 0) {
+        showError(signupStatus, 'Booking system is not set up yet. Please WhatsApp or email us directly instead.');
+        return;
+      }
+
+      var submitBtn = signupForm.querySelector('button[type="submit"]');
+      var originalBtnText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+      signupStatus.className = 'form-status';
+      signupStatus.textContent = '';
+
+      fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({ teamName: teamName, name: name, email: email, phone: phone, area: area, date: date, people: people, notes: notes })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+
+          if (result.status === 'confirmed') {
+            signupStatus.innerHTML = 'You\'re booked in for ' + date + '! We\'ve emailed you a confirmation — now just <a href="https://monzo.me/martinhughes20" target="_blank" rel="noopener">pay £25 via Monzo</a> to secure it (use your name + date as the reference).';
+            signupStatus.className = 'form-status is-visible form-status--success';
+            signupForm.reset();
+          } else if (result.status === 'full') {
+            signupStatus.textContent = 'Sorry — that date just filled up. Please pick another date from the list above.';
+            signupStatus.className = 'form-status is-visible';
+          } else {
+            showError(signupStatus, 'Something went wrong submitting your sign-up. Please WhatsApp or email us directly instead.');
+          }
+        })
+        .catch(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+          showError(signupStatus, 'Could not reach the booking system. Please WhatsApp or email us directly instead.');
+        });
     });
   }
 })();

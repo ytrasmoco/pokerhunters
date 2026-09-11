@@ -27,6 +27,13 @@ const POKER_HUNTERS_EVENTS = [
   { date: '2026-11-29', notes: 'Bonus checkpoint added for this one' },
 ];
 
+/*
+ * Booking backend (Google Apps Script Web App URL). See
+ * google-apps-script/Code.gs for the backend code and setup
+ * instructions. Paste the deployed Web App URL below once set up.
+ */
+const POKER_HUNTERS_BOOKING_API_URL = 'REPLACE_WITH_YOUR_DEPLOYED_WEB_APP_URL';
+
 /* ============================================================
  *  Rendering logic — no need to edit anything below this line
  * ============================================================ */
@@ -59,7 +66,20 @@ const POKER_HUNTERS_EVENTS = [
       .sort(function (a, b) { return a.date - b.date; });
   }
 
-  function renderNextEvent() {
+  // Ask the booking backend which dates are already full. Resolves to
+  // an empty array (nothing marked full) if the backend isn't set up
+  // yet, or is unreachable, so the site still works without it.
+  function fetchFullDates() {
+    if (!POKER_HUNTERS_BOOKING_API_URL || POKER_HUNTERS_BOOKING_API_URL.indexOf('REPLACE_WITH') === 0) {
+      return Promise.resolve([]);
+    }
+    return fetch(POKER_HUNTERS_BOOKING_API_URL)
+      .then(function (res) { return res.json(); })
+      .then(function (data) { return data.fullDates || []; })
+      .catch(function () { return []; });
+  }
+
+  function renderNextEvent(fullDates) {
     var el = document.getElementById('nextEvent');
     if (!el) return;
 
@@ -74,16 +94,20 @@ const POKER_HUNTERS_EVENTS = [
     }
 
     var next = upcoming[0];
+    var isFull = fullDates.indexOf(next.iso) !== -1;
+
     el.innerHTML =
-      '<p class="next-event__date">' + formatDate(next.date) + '</p>' +
+      '<p class="next-event__date">' + formatDate(next.date) + (isFull ? ' — Fully Booked' : '') + '</p>' +
       (next.notes ? '<p class="next-event__notes">' + next.notes + '</p>' : '') +
       '<div class="next-event__ctas">' +
-      '<a href="signup.html?date=' + next.iso + '" class="btn btn--gold">Sign Up for This Date</a>' +
+      (isFull
+        ? '<a href="https://wa.me/447471176985" target="_blank" rel="noopener" class="btn btn--gold">Ask About This Date</a>'
+        : '<a href="signup.html?date=' + next.iso + '" class="btn btn--gold">Sign Up for This Date</a>') +
       (upcoming.length > 1 ? '<a href="events.html" class="btn btn--outline">See All Upcoming Dates</a>' : '') +
       '</div>';
   }
 
-  function renderEventsList() {
+  function renderEventsList(fullDates) {
     var el = document.getElementById('eventsList');
     if (!el) return;
 
@@ -99,15 +123,18 @@ const POKER_HUNTERS_EVENTS = [
     }
 
     el.innerHTML = upcoming.map(function (ev) {
+      var isFull = fullDates.indexOf(ev.iso) !== -1;
       return '<div class="event-card">' +
-        '<p class="event-card__date">' + formatDate(ev.date) + '</p>' +
+        '<p class="event-card__date">' + formatDate(ev.date) + (isFull ? ' — Fully Booked' : '') + '</p>' +
         (ev.notes ? '<p class="event-card__notes">' + ev.notes + '</p>' : '') +
-        '<a href="signup.html?date=' + ev.iso + '" class="btn btn--primary">Sign Up for This Date</a>' +
+        (isFull
+          ? '<a href="https://wa.me/447471176985" target="_blank" rel="noopener" class="btn btn--outline">Ask About This Date</a>'
+          : '<a href="signup.html?date=' + ev.iso + '" class="btn btn--primary">Sign Up for This Date</a>') +
         '</div>';
     }).join('');
   }
 
-  function renderSignupDateOptions() {
+  function renderSignupDateOptions(fullDates) {
     var select = document.getElementById('su-date');
     if (!select) return;
 
@@ -120,8 +147,9 @@ const POKER_HUNTERS_EVENTS = [
 
     var options = ['<option value="" disabled selected>Choose a date</option>'].concat(
       upcoming.map(function (ev) {
-        var label = formatDate(ev.date) + (ev.notes ? ' — ' + ev.notes : '');
-        return '<option value="' + ev.iso + '">' + label + '</option>';
+        var isFull = fullDates.indexOf(ev.iso) !== -1;
+        var label = formatDate(ev.date) + (ev.notes ? ' — ' + ev.notes : '') + (isFull ? ' (FULL)' : '');
+        return '<option value="' + ev.iso + '"' + (isFull ? ' disabled' : '') + '>' + label + '</option>';
       })
     );
     select.innerHTML = options.join('');
@@ -129,14 +157,16 @@ const POKER_HUNTERS_EVENTS = [
     // Pre-fill if arriving via a "Sign Up for This Date" link
     // (e.g. signup.html?date=2026-10-18) from the homepage or events page.
     var requestedDate = new URLSearchParams(window.location.search).get('date');
-    if (requestedDate && upcoming.some(function (ev) { return ev.iso === requestedDate; })) {
+    if (requestedDate && upcoming.some(function (ev) { return ev.iso === requestedDate; }) && fullDates.indexOf(requestedDate) === -1) {
       select.value = requestedDate;
     }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    renderNextEvent();
-    renderEventsList();
-    renderSignupDateOptions();
+    fetchFullDates().then(function (fullDates) {
+      renderNextEvent(fullDates);
+      renderEventsList(fullDates);
+      renderSignupDateOptions(fullDates);
+    });
   });
 })();
