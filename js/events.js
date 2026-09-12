@@ -148,7 +148,7 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
     var options = ['<option value="" disabled selected>Choose a date</option>'].concat(
       upcoming.map(function (ev) {
         var isFull = fullDates.indexOf(ev.iso) !== -1;
-        var label = formatDate(ev.date) + (ev.notes ? ' — ' + ev.notes : '') + (isFull ? ' (FULL)' : '');
+        var label = formatDate(ev.date) + (ev.notes ? ' *' : '') + (isFull ? ' (FULL)' : '');
         return '<option value="' + ev.iso + '"' + (isFull ? ' disabled' : '') + '>' + label + '</option>';
       })
     );
@@ -159,6 +159,22 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
     var requestedDate = new URLSearchParams(window.location.search).get('date');
     if (requestedDate && upcoming.some(function (ev) { return ev.iso === requestedDate; }) && fullDates.indexOf(requestedDate) === -1) {
       select.value = requestedDate;
+    }
+
+    // Spell out what each "*" means, since the dropdown itself only
+    // has room for a short label.
+    var legend = document.getElementById('su-date-legend');
+    if (legend) {
+      var noted = upcoming.filter(function (ev) { return ev.notes; });
+      if (noted.length) {
+        legend.innerHTML = noted.map(function (ev) {
+          return '<span class="hint">* ' + formatDate(ev.date) + ' — ' + ev.notes + '</span>';
+        }).join('<br>');
+        legend.hidden = false;
+      } else {
+        legend.innerHTML = '';
+        legend.hidden = true;
+      }
     }
   }
 
