@@ -735,6 +735,7 @@ textarea:focus-visible {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
 }
+.form-row--split > div { min-width: 0; }
 @media (max-width: 560px) {
   .form-row--split { grid-template-columns: 1fr; }
 }
@@ -751,6 +752,8 @@ textarea:focus-visible {
 .form-row input,
 .form-row select,
 .form-row textarea {
+  width: 100%;
+  max-width: 100%;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
