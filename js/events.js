@@ -67,16 +67,31 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
   }
 
   // Ask the booking backend which dates are already full. Resolves to
-  // an empty array (nothing marked full) if the backend isn't set up
-  // yet, or is unreachable, so the site still works without it.
+  // an empty array (nothing marked full) if the backend isn't set up,
+  // unreachable, or just slow to wake up (Apps Script cold starts can
+  // take several seconds) — a hard timeout means this can never hang
+  // the page waiting on it. The real capacity cap is still enforced
+  // server-side at sign-up time regardless of what this shows.
   function fetchFullDates() {
     if (!POKER_HUNTERS_BOOKING_API_URL || POKER_HUNTERS_BOOKING_API_URL.indexOf('REPLACE_WITH') === 0) {
       return Promise.resolve([]);
     }
-    return fetch(POKER_HUNTERS_BOOKING_API_URL)
+
+    var timeoutMs = 8000;
+    var hasAbortController = typeof AbortController !== 'undefined';
+    var controller = hasAbortController ? new AbortController() : null;
+    var timeoutId = setTimeout(function () {
+      if (controller) controller.abort();
+    }, timeoutMs);
+
+    return fetch(POKER_HUNTERS_BOOKING_API_URL, controller ? { signal: controller.signal } : undefined)
       .then(function (res) { return res.json(); })
       .then(function (data) { return data.fullDates || []; })
-      .catch(function () { return []; });
+      .catch(function () { return []; })
+      .then(function (result) {
+        clearTimeout(timeoutId);
+        return result;
+      });
   }
 
   function renderNextEvent(fullDates) {
@@ -138,6 +153,11 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
     var select = document.getElementById('su-date');
     if (!select) return;
 
+    // Remember whatever's already selected so a later re-render (once the
+    // capacity check comes back) doesn't clobber a choice the visitor's
+    // already made.
+    var previousValue = select.value;
+
     var upcoming = getUpcoming();
 
     if (upcoming.length === 0) {
@@ -155,8 +175,9 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
     select.innerHTML = options.join('');
 
     // Pre-fill if arriving via a "Sign Up for This Date" link
-    // (e.g. signup.html?date=2026-10-18) from the homepage or events page.
-    var requestedDate = new URLSearchParams(window.location.search).get('date');
+    // (e.g. signup.html?date=2026-10-18) from the homepage or events page,
+    // otherwise restore whatever was already selected.
+    var requestedDate = new URLSearchParams(window.location.search).get('date') || previousValue;
     if (requestedDate && upcoming.some(function (ev) { return ev.iso === requestedDate; }) && fullDates.indexOf(requestedDate) === -1) {
       select.value = requestedDate;
     }
@@ -179,7 +200,15 @@ const POKER_HUNTERS_BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycb
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    // Render immediately with local data so the page never waits on the
+    // booking backend — dates always show up straight away. If/when the
+    // capacity check comes back, re-render to add any "(FULL)" labels.
+    renderNextEvent([]);
+    renderEventsList([]);
+    renderSignupDateOptions([]);
+
     fetchFullDates().then(function (fullDates) {
+      if (fullDates.length === 0) return;
       renderNextEvent(fullDates);
       renderEventsList(fullDates);
       renderSignupDateOptions(fullDates);
