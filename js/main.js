@@ -122,9 +122,17 @@
           submitBtn.textContent = originalBtnText;
 
           if (result.status === 'confirmed') {
-            signupStatus.innerHTML = 'You\'re booked in for ' + date + '! We\'ve emailed you a confirmation — now just <a href="https://monzo.me/martinhughes20" target="_blank" rel="noopener">pay £25 via Monzo</a> to secure it (use your name + date as the reference).';
+            signupStatus.innerHTML = 'Your place for ' + date + ' is reserved — one last step below.';
             signupStatus.className = 'form-status is-visible form-status--success';
-            signupForm.reset();
+
+            signupForm.hidden = true;
+            document.getElementById('su-intro').hidden = true;
+            document.getElementById('su-heading').textContent = 'You\'re In — Pay to Confirm';
+
+            var paymentStep = document.getElementById('paymentStep');
+            document.getElementById('paymentRef').textContent = name + ' — ' + date;
+            paymentStep.hidden = false;
+            paymentStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
           } else if (result.status === 'full') {
             signupStatus.textContent = 'Sorry — that date just filled up. Please pick another date from the list above.';
             signupStatus.className = 'form-status is-visible';
